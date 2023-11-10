@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3 uid="uid://2ptld37vbimo"]
+
+[ext_resource type="Script" path="res://Player.cs" id="1_8o2xp"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_rglat"]
+size = Vector3(20, 0.01, 20)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_wr1s6"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_rpf54"]
+
+[node name="Node3D" type="Node3D"]
+
+[node name="Ground" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+shape = SubResource("BoxShape3D_rglat")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
+mesh = SubResource("PlaneMesh_wr1s6")
+
+[node name="Player" type="RigidBody3D" parent="."]
+script = ExtResource("1_8o2xp")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_rpf54")
+
+[node name="Camera3D" type="Camera3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
