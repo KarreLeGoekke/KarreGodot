@@ -1,31 +1,102 @@
-[gd_scene load_steps=5 format=3 uid="uid://2ptld37vbimo"]
+[gd_scene load_steps=16 format=3 uid="uid://2ptld37vbimo"]
 
 [ext_resource type="Script" path="res://Player.cs" id="1_8o2xp"]
+[ext_resource type="Texture2D" uid="uid://b3qb2rtf2qn4y" path="res://Assets/kloofendal_43d_clear_puresky_2k.hdr" id="2_0kvtl"]
+[ext_resource type="Script" path="res://addons/zylann.hterrain/hterrain.gd" id="3_tf1ar"]
+[ext_resource type="Resource" path="res://Terrain/data.hterrain" id="4_5c4xk"]
+[ext_resource type="Script" path="res://addons/zylann.hterrain/hterrain_texture_set.gd" id="5_28df6"]
+[ext_resource type="Texture2D" uid="uid://bqgrx0xuciaud" path="res://Godotify_slot0_albedo_bump.png" id="6_uwxiy"]
+[ext_resource type="Texture2D" uid="uid://bnd461bfp4sv1" path="res://Godotify_slot1_albedo_bump.png" id="7_0ihbf"]
+[ext_resource type="Texture2D" uid="uid://c7kuvylnh5ics" path="res://Godotify_slot0_normal_roughness.png" id="7_n8lm6"]
+[ext_resource type="Texture2D" uid="uid://dtv7spr18ryx" path="res://Godotify_slot1_normal_roughness.png" id="9_spirm"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_rglat"]
-size = Vector3(20, 0.01, 20)
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_j80tn"]
+panorama = ExtResource("2_0kvtl")
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_wr1s6"]
+[sub_resource type="Sky" id="Sky_fklmo"]
+sky_material = SubResource("PanoramaSkyMaterial_j80tn")
+
+[sub_resource type="Environment" id="Environment_lysxo"]
+background_mode = 2
+sky = SubResource("Sky_fklmo")
+ambient_light_sky_contribution = 0.25
+ambient_light_energy = 0.0
+tonemap_mode = 2
+glow_enabled = true
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_rpf54"]
 
-[node name="Node3D" type="Node3D"]
+[sub_resource type="Resource" id="Resource_bi484"]
+script = ExtResource("5_28df6")
+mode = 0
+textures = [[ExtResource("6_uwxiy"), ExtResource("7_0ihbf")], [ExtResource("7_n8lm6"), ExtResource("9_spirm")]]
 
-[node name="Ground" type="StaticBody3D" parent="."]
+[sub_resource type="BoxShape3D" id="BoxShape3D_i70en"]
+size = Vector3(36.5491, 20.6914, 1)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
-shape = SubResource("BoxShape3D_rglat")
+[node name="Root" type="Node3D"]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
-transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
-mesh = SubResource("PlaneMesh_wr1s6")
+[node name="Environment" type="Node3D" parent="."]
 
-[node name="Player" type="RigidBody3D" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Environment"]
+environment = SubResource("Environment_lysxo")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Environment"]
+transform = Transform3D(-0.705463, -0.684596, 0.183437, -0.466751, 0.643527, 0.606644, -0.533353, 0.342345, -0.773521, -1.41203, 3.74061, 0.0712813)
+light_angular_distance = 0.05
+shadow_enabled = true
+
+[node name="Player" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.39163, 0.0772024, 8.23452)
 script = ExtResource("1_8o2xp")
+Speed = 4.0
+Sensitivity = 1.0
+Sprint_FOV_Difference = 5.0
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
+[node name="Physics" type="CollisionShape3D" parent="Player"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("CapsuleShape3D_rpf54")
 
-[node name="Camera3D" type="Camera3D" parent="Player"]
+[node name="Head" type="Node3D" parent="Player"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+
+[node name="Camera" type="Camera3D" parent="Player/Head"]
+
+[node name="Map" type="Node3D" parent="."]
+
+[node name="HTerrain" type="Node3D" parent="Map"]
+script = ExtResource("3_tf1ar")
+centered = true
+_terrain_data = ExtResource("4_5c4xk")
+chunk_size = 16
+collision_enabled = true
+collision_layer = 1
+collision_mask = 1
+shader_type = "Classic4Lite"
+custom_shader = null
+custom_globalmap_shader = null
+texture_set = SubResource("Resource_bi484")
+render_layers = 1
+cast_shadow = 1
+shader_params/u_ground_uv_scale = 1.0
+shader_params/u_depth_blending = true
+shader_params/u_triplanar = false
+shader_params/u_tile_reduction = null
+
+[node name="Boundary" type="StaticBody3D" parent="Map"]
+
+[node name="Physics" type="CollisionShape3D" parent="Map/Boundary"]
+transform = Transform3D(-1.25, 0, -1.09278e-07, 0, 1.25, 0, 1.09278e-07, 0, -1.25, -3.92814, -3.8147e-06, -18.1981)
+shape = SubResource("BoxShape3D_i70en")
+
+[node name="Physics2" type="CollisionShape3D" parent="Map/Boundary"]
+transform = Transform3D(-5.46392e-08, 0, 1.25, 0, 1.25, 0, -1.25, 0, -5.46392e-08, 14.5187, -3.8147e-06, -3.72364)
+shape = SubResource("BoxShape3D_i70en")
+
+[node name="Physics3" type="CollisionShape3D" parent="Map/Boundary"]
+transform = Transform3D(1.25, 0, 0, 0, 1.25, 0, 0, 0, 1.25, -1.39163, 0, 10.7385)
+shape = SubResource("BoxShape3D_i70en")
+
+[node name="Physics4" type="CollisionShape3D" parent="Map/Boundary"]
+transform = Transform3D(-5.46392e-08, 0, -1.25, 0, 1.25, 0, 1.25, 0, -5.46392e-08, -19.8385, 0, -3.73591)
+shape = SubResource("BoxShape3D_i70en")
